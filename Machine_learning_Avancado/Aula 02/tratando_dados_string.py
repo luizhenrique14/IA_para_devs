@@ -5,7 +5,7 @@ import pandas as pd
 
 #  Lendo a base de dados
 print("\n Lendo a base de dados...")
-dados = pd.read_excel('Michine_learning_Avancado\Aula 02\Recrutamento.xlsx')
+dados = pd.read_excel('Machine_learning_Avancado\Aula 02\Recrutamento.xlsx')
 print("Formato dos dados:", dados.shape)
 print("Primeiras linhas do DataFrame:")
 print(dados.head(3))
