@@ -154,23 +154,40 @@ print("Formato do teste:", x_test.shape)
 
 # 📏 Escalonamento dos dados
 print("\n📏 Escalonando os dados (StandardScaler)...")
+# 📏 Escalonamento dos dados (StandardScaler)
+# O escalonamento é importante porque muitos algoritmos de machine learning (como KNN e SVM)
+# são sensíveis à escala das variáveis. Se as features têm escalas muito diferentes,
+# variáveis com valores maiores podem dominar a distância ou o cálculo do modelo,
+# prejudicando o desempenho. O StandardScaler transforma os dados para que cada feature
+# tenha média 0 e desvio padrão 1, padronizando a escala.
 from sklearn.preprocessing import StandardScaler, MinMaxScaler  
 scaler = StandardScaler() 
-scaler.fit(x_train)
-x_train_escalonado = scaler.transform(x_train)
-x_test_escalonado = scaler.transform(x_test) 
+scaler.fit(x_train)  # Calcula a média e o desvio padrão apenas nos dados de treino
+x_train_escalonado = scaler.transform(x_train)  # Aplica a transformação nos dados de treino
+x_test_escalonado = scaler.transform(x_test)    # Aplica a mesma transformação nos dados de teste
 print("Exemplo de dados escalonados (primeira linha):", x_train_escalonado[0])
+
 
 # 🔢 Testando diferentes valores de K para o KNN
 print("\n🔢 Testando diferentes valores de K para o KNN (de 1 a 9)...")
 import numpy as np
 error = []
+# Testando diferentes valores de K para o KNN (de 1 a 9)
+# O objetivo é encontrar o valor de K que gera o menor erro médio de classificação.
+# Para cada valor de K, treinamos o modelo, fazemos previsões e calculamos o erro médio.
 for i in range(1, 10):
+    # Cria o classificador KNN com o valor atual de K (n_neighbors=i)
     knn = KNeighborsClassifier(n_neighbors=i)
+    # Treina o modelo com os dados de treino já escalonados
     knn.fit(x_train_escalonado, y_train)
+    # Faz previsões usando os dados de teste escalonados
     pred_i = knn.predict(x_test_escalonado)
+    # Calcula o erro médio (proporção de previsões incorretas) e adiciona à lista de erros
     error.append(np.mean(pred_i != y_test))
+
+# Exibe os erros médios para cada valor de K testado
 print("Erros médios para cada valor de K (de 1 a 9):", error)
+
 
 plt.figure(figsize=(12, 6))
 plt.plot(range(1, 10), error, color='red', linestyle='dashed', marker='o',
