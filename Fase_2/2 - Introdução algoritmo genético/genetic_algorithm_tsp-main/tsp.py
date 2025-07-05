@@ -1,3 +1,15 @@
+# -------------------------------------------------------------
+# Traveling Salesman Problem (TSP) Solver using Genetic Algorithm
+# Visualized with Pygame
+#
+# Este código resolve o problema do caixeiro viajante (TSP) usando
+# um algoritmo genético e exibe o processo de evolução das soluções
+# em tempo real usando a biblioteca Pygame.
+#
+# Autor: [Seu Nome]
+# Data: [Data de Criação]
+# -------------------------------------------------------------
+
 import pygame
 from pygame.locals import *
 import random
@@ -9,7 +21,8 @@ import numpy as np
 import pygame
 from benchmark_att48 import *
 
-
+# LOG: Inicializando constantes e parâmetros do algoritmo
+print("[LOG] Inicializando constantes e parâmetros do algoritmo...")
 # Define constant values
 # pygame
 WIDTH, HEIGHT = 800, 400
@@ -29,17 +42,16 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-
+# LOG: Gerando cidades aleatórias para o problema
+print(f"[LOG] Gerando {N_CITIES} cidades aleatórias...")
 # Initialize problem
 # Using Random cities generation
 cities_locations = [(random.randint(NODE_RADIUS + PLOT_X_OFFSET, WIDTH - NODE_RADIUS), random.randint(NODE_RADIUS, HEIGHT - NODE_RADIUS))
                     for _ in range(N_CITIES)]
 
-
 # # Using Deault Problems: 10, 12 or 15
 # WIDTH, HEIGHT = 800, 400
 # cities_locations = default_problems[15]
-
 
 # Using att48 benchmark
 # WIDTH, HEIGHT = 1500, 800
@@ -55,7 +67,8 @@ cities_locations = [(random.randint(NODE_RADIUS + PLOT_X_OFFSET, WIDTH - NODE_RA
 # print(f"Best Solution: {fitness_target_solution}")
 # ----- Using att48 benchmark
 
-
+# LOG: Inicializando Pygame e variáveis principais
+print("[LOG] Inicializando Pygame...")
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -63,31 +76,37 @@ pygame.display.set_caption("TSP Solver using Pygame")
 clock = pygame.time.Clock()
 generation_counter = itertools.count(start=1)  # Start the counter at 1
 
-
+# LOG: Gerando população inicial
+print(f"[LOG] Gerando população inicial de tamanho {POPULATION_SIZE}...")
 # Create Initial Population
 # TODO:- use some heuristic like Nearest Neighbour our Convex Hull to initialize
 population = generate_random_population(cities_locations, POPULATION_SIZE)
 best_fitness_values = []
 best_solutions = []
 
-
+# LOG: Iniciando o loop principal do algoritmo genético
+print("[LOG] Iniciando o loop principal do algoritmo genético...")
 # Main game loop
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print("[LOG] Encerrando execução via janela do Pygame.")
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q:
+                print("[LOG] Encerrando execução via tecla Q.")
                 running = False
 
     generation = next(generation_counter)
 
     screen.fill(WHITE)
 
+    # LOG: Calculando fitness da população
     population_fitness = [calculate_fitness(
         individual) for individual in population]
 
+    # LOG: Ordenando população por fitness
     population, population_fitness = sort_population(
         population,  population_fitness)
 
@@ -97,6 +116,7 @@ while running:
     best_fitness_values.append(best_fitness)
     best_solutions.append(best_solution)
 
+    # LOG: Desenhando gráficos e caminhos na tela
     draw_plot(screen, list(range(len(best_fitness_values))),
               best_fitness_values, y_label="Fitness - Distance (pxls)")
 
@@ -104,9 +124,9 @@ while running:
     draw_paths(screen, best_solution, BLUE, width=3)
     draw_paths(screen, population[1], rgb_color=(128, 128, 128), width=1)
 
-    print(f"Generation {generation}: Best fitness = {round(best_fitness, 2)}")
+    print(f"[LOG] Geração {generation}: Melhor fitness = {round(best_fitness, 2)}")
 
-    new_population = [population[0]]  # Keep the best individual: ELITISM
+    new_population = [population[0]]  # Keep the best individual: ELITISM / Elitimos, se remover o population[0] será removido o melhor indivíduo e ele se perde
 
     while len(new_population) < POPULATION_SIZE:
 
@@ -114,6 +134,7 @@ while running:
         # simple selection based on first 10 best solutions
         # parent1, parent2 = random.choices(population[:10], k=2)
 
+        # Tentar trocar a fitness probability para uma seleção baseada em metodo de seleção por torneio
         # solution based on fitness probability
         probability = 1 / np.array(population_fitness)
         parent1, parent2 = random.choices(population, weights=probability, k=2)
@@ -130,7 +151,8 @@ while running:
     pygame.display.flip()
     clock.tick(FPS)
 
-
+# LOG: Loop principal encerrado. Finalizando execução.
+print("[LOG] Loop principal encerrado. Finalizando execução...")
 # TODO: save the best individual in a file if it is better than the one saved.
 
 # exit software
