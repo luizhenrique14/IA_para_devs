@@ -1,18 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+import time
 from copy import deepcopy
 
 TAMANHO = 6
-
-# CARROS_INICIAIS = [
-#     ('A', [(0, 0), (0, 1)]),
-#     ('B', [(1, 3), (1, 4), (1, 5)]),
-#     ('X', [(2, 0), (2, 1)]),  # carro vermelho livre
-#     ('C', [(3, 0), (4, 0)]),
-#     ('D', [(3, 2), (3, 3), (3, 4)]),
-#     ('E', [(5, 3), (5, 4), (5, 5)]),
-# ]
 
 CARROS_INICIAIS = [
     ('A', [(0, 0), (0, 1)]),
@@ -39,6 +31,7 @@ class EstacionamentoApp:
         self.selecionado = None
         self.movimentos = 0
         self.tentativas = 0
+        self.acao_executada = []
 
         self.label_movimentos = tk.Label(self.root, text="Movimentos: 0", font=("Arial", 12))
         self.label_movimentos.grid(row=TAMANHO + 1, column=0, columnspan=6)
@@ -146,12 +139,15 @@ class EstacionamentoApp:
 
     def resolver_ag(self):
         self.tentativas = 0
+        self.acao_executada = []
+        self.inicio_tempo = time.time()
         self.tentar_ate_resolver()
 
     def tentar_ate_resolver(self):
         self.tentativas += 1
         temp = deepcopy(self.grade)
         count = 0
+        passos = []
 
         for _ in range(50):
             carros = sorted(set(c for row in temp for c in row if c != '.'))
@@ -160,6 +156,7 @@ class EstacionamentoApp:
             novo_estado = self.mover_carro(temp, carro, direcao)
             if novo_estado:
                 temp = novo_estado
+                passos.append((carro, direcao))
                 count += 1
             self.grade = deepcopy(temp)
             self.atualizar_interface()
@@ -168,8 +165,12 @@ class EstacionamentoApp:
             if any(j == TAMANHO - 1 for i, j in pos):
                 self.grade = temp
                 self.movimentos += count
+                tempo_final = time.time() - self.inicio_tempo
                 self.atualizar_interface()
-                messagebox.showinfo("🏆 AG", f"Resolvido com {count} movimentos após {self.tentativas} tentativas!")
+                resumo = f"Resolvido com {count} movimentos após {self.tentativas} tentativas em {tempo_final:.2f} segundos.\n\nSequência:\n"
+                for p in passos:
+                    resumo += f"{p[0]} → {p[1]}\n"
+                messagebox.showinfo("🏆 AG", resumo)
                 return
 
         self.root.after(200, self.tentar_ate_resolver)
