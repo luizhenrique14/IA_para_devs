@@ -31,17 +31,13 @@ class EstacionamentoApp:
         self.selecionado = None
         self.movimentos = 0
         self.tentativas = 0
-        self.acao_executada = []
-
         self.label_movimentos = tk.Label(self.root, text="Movimentos: 0", font=("Arial", 12))
         self.label_movimentos.grid(row=TAMANHO + 1, column=0, columnspan=6)
         self.label_tentativas = tk.Label(self.root, text="Tentativas: 0", font=("Arial", 12))
         self.label_tentativas.grid(row=TAMANHO + 2, column=0, columnspan=6)
-
         self.inicializar_grade()
         self.desenhar_interface()
         self.atualizar_interface()
-
         self.root.bind("<Up>", lambda e: self.mover_selecionado('cima'))
         self.root.bind("<Down>", lambda e: self.mover_selecionado('baixo'))
         self.root.bind("<Left>", lambda e: self.mover_selecionado('esquerda'))
@@ -81,7 +77,6 @@ class EstacionamentoApp:
         if self.selecionado:
             i, j = self.selecionado
             self.botoes[i][j]['bg'] = 'yellow'
-
         self.label_movimentos['text'] = f"Movimentos: {self.movimentos}"
         self.label_tentativas['text'] = f"Tentativas: {self.tentativas}"
         self.root.update_idletasks()
@@ -112,7 +107,6 @@ class EstacionamentoApp:
         if not posicoes:
             return False
         novo = deepcopy(grade)
-
         if all(p[0] == posicoes[0][0] for p in posicoes):
             linha = posicoes[0][0]
             js = sorted(p[1] for p in posicoes)
@@ -139,41 +133,41 @@ class EstacionamentoApp:
 
     def resolver_ag(self):
         self.tentativas = 0
-        self.acao_executada = []
         self.inicio_tempo = time.time()
-        self.tentar_ate_resolver()
+        self.executar_geracoes()
 
-    def tentar_ate_resolver(self):
+    def executar_geracoes(self):
         self.tentativas += 1
         temp = deepcopy(self.grade)
-        count = 0
         passos = []
 
-        for _ in range(50):
+        for _ in range(200):
             carros = sorted(set(c for row in temp for c in row if c != '.'))
             carro = random.choice(carros)
-            direcao = random.choice(DIRECOES)
-            novo_estado = self.mover_carro(temp, carro, direcao)
-            if novo_estado:
-                temp = novo_estado
-                passos.append((carro, direcao))
-                count += 1
+            direcoes_validas = list(DIRECOES)
+            random.shuffle(direcoes_validas)
+            for direcao in direcoes_validas:
+                novo_estado = self.mover_carro(temp, carro, direcao)
+                if novo_estado:
+                    temp = novo_estado
+                    passos.append((carro, direcao))
+                    break
+
             self.grade = deepcopy(temp)
             self.atualizar_interface()
 
             pos = [(i, j) for i in range(TAMANHO) for j in range(TAMANHO) if temp[i][j] == 'X']
             if any(j == TAMANHO - 1 for i, j in pos):
-                self.grade = temp
-                self.movimentos += count
                 tempo_final = time.time() - self.inicio_tempo
+                self.grade = temp
                 self.atualizar_interface()
-                resumo = f"Resolvido com {count} movimentos após {self.tentativas} tentativas em {tempo_final:.2f} segundos.\n\nSequência:\n"
+                resumo = f"Resolvido com {len(passos)} movimentos após {self.tentativas} tentativas em {tempo_final:.2f} segundos.\n\nSequência:\n"
                 for p in passos:
                     resumo += f"{p[0]} → {p[1]}\n"
                 messagebox.showinfo("🏆 AG", resumo)
                 return
 
-        self.root.after(200, self.tentar_ate_resolver)
+        self.root.after(50, self.executar_geracoes)
 
 if __name__ == "__main__":
     root = tk.Tk()
