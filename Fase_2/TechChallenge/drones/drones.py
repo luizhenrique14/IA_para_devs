@@ -85,7 +85,6 @@ class Visualizador:
         self.reset_button = ttk.Button(self.frame_controls, text="🔄 Reiniciar", command=self.reiniciar)
         self.reset_button.grid(row=0, column=2, padx=5)
 
-        # Campos para parâmetros
         labels = ["Drones", "Autonomia (km)", "População", "Gerações", "Mutação"]
         defaults = [2, 30, 50, 100, 0.1]
         self.entries = {}
@@ -112,16 +111,24 @@ class Visualizador:
             self.geracoes = int(self.entries["Gerações"].get())
             self.mutacao = float(self.entries["Mutação"].get())
 
-            coordenadas = BAIRROS_COORDENADAS
-            partes = [coordenadas[i::qtd_drones] for i in range(qtd_drones)]
+            coordenadas = BAIRROS_COORDENADAS.copy()
+            random.shuffle(coordenadas)
+            chunk_size = len(coordenadas) // qtd_drones
+            self.partes = [coordenadas[i*chunk_size:(i+1)*chunk_size] for i in range(qtd_drones)]
+            if len(coordenadas) % qtd_drones != 0:
+                self.partes[-1].extend(coordenadas[qtd_drones*chunk_size:])
+
             self.algoritmos = [
                 AlgoritmoGenetico(parte, self.autonomia, populacao, self.mutacao)
-                for parte in partes
+                for parte in self.partes
             ]
 
             self.rodando = True
-            self.ani = animation.FuncAnimation(self.fig, self.update_plot, frames=self.geracoes, interval=500, repeat=False, 
-                                               init_func=self.init_anim, blit=False)
+            self.ani = animation.FuncAnimation(
+                self.fig, self.update_plot,
+                frames=self.geracoes, interval=500,
+                repeat=False, init_func=self.init_anim, blit=False
+            )
             self.canvas_fig.draw()
             plt.show(block=False)
             self.status.config(text="Simulação em andamento...", fg="green")
@@ -143,14 +150,16 @@ class Visualizador:
         self.ax.clear()
         self.ax.set_title(f"Geração {frame + 1}")
         cores = ["blue", "red", "green", "purple", "orange", "black", "cyan", "brown", "pink", "olive"]
+
         for idx, ag in enumerate(self.algoritmos):
             rota = ag.evoluir()
             x, y = zip(*rota.pontos)
-            self.ax.plot(y, x, marker='o', color=cores[idx % len(cores)], label=f'Drone {idx+1}')
+            self.ax.plot(y, x, marker='o', linestyle='-', color=cores[idx % len(cores)], label=f'Drone {idx+1}')
+            self.ax.scatter(y, x, color=cores[idx % len(cores)], s=20)
+
         self.ax.legend(loc='center left', bbox_to_anchor=(1.02, 0.5), borderaxespad=0.)
         self.canvas_fig.draw()
 
-        # Geração final: exibir relatório
         if frame + 1 == self.geracoes:
             print("\n📋 RELATÓRIO FINAL")
             for i, ag in enumerate(self.algoritmos):
@@ -162,7 +171,7 @@ class Visualizador:
                 print(f"Drone {i+1}:")
                 print(f"  - Total de entregas: {entregas}")
                 print(f"  - Distância total: {distancia:.2f} km")
-                print(f"  - Entregas por voo (autonomia {autonomia} km): ~{entregas // viagens}")
+                print(f"  - Entregas por voo (autonomia {autonomia} km): ~{entregas // int(viagens)}")
                 print(f"  - Recarregamentos necessários: {int(viagens) - 1}\n")
 
 # 🚀 PONTO DE ENTRADA
