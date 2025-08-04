@@ -1,22 +1,23 @@
 
-# 📦 IMPORTAÇÕES E PARÂMETROS INICIAIS
 import random
 import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.image as mpimg
 from haversine import haversine, Unit
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
+from bairros_sp import BAIRROS_COORDENADAS
 
-from bairros_sp import BAIRROS_COORDENADAS  # Importa 300 bairros reais de São Paulo
+BASE_COORDENADA = (-23.5505, -46.6333)  # Marco Zero de SP (Praça da Sé)
 
-# 🚚 CLASSE ROTA - Representa um indivíduo (possível solução)
 class Rota:
     def __init__(self, pontos, autonomia, mutacao):
-        self.pontos = pontos[:]
+        self.entregas = pontos[:]
         self.autonomia = autonomia
         self.mutacao = mutacao
-        random.shuffle(self.pontos)
+        random.shuffle(self.entregas)
+        self.pontos = [BASE_COORDENADA] + self.entregas + [BASE_COORDENADA]
         self.distancia_total = self.calcular_distancia()
 
     def calcular_distancia(self):
@@ -31,20 +32,20 @@ class Rota:
         return 1 / self.distancia_total
 
     def crossover(self, outra):
-        meio = len(self.pontos) // 2
-        filho_pontos = self.pontos[:meio] + [p for p in outra.pontos if p not in self.pontos[:meio]]
-        return Rota(filho_pontos, self.autonomia, self.mutacao)
+        meio = len(self.entregas) // 2
+        filho_entregas = self.entregas[:meio] + [p for p in outra.entregas if p not in self.entregas[:meio]]
+        return Rota(filho_entregas, self.autonomia, self.mutacao)
 
     def mutar(self):
         if random.random() < self.mutacao:
-            i, j = random.sample(range(len(self.pontos)), 2)
-            self.pontos[i], self.pontos[j] = self.pontos[j], self.pontos[i]
+            i, j = random.sample(range(len(self.entregas)), 2)
+            self.entregas[i], self.entregas[j] = self.entregas[j], self.entregas[i]
+            self.pontos = [BASE_COORDENADA] + self.entregas + [BASE_COORDENADA]
             self.distancia_total = self.calcular_distancia()
 
-# 🧠 CLASSE ALGORITMO GENÉTICO
 class AlgoritmoGenetico:
     def __init__(self, coordenadas, autonomia, populacao_size, mutacao):
-        self.coordenadas = coordenadas
+        self.entregas = coordenadas
         self.autonomia = autonomia
         self.populacao = [Rota(coordenadas, autonomia, mutacao) for _ in range(populacao_size)]
         self.melhor_rota = min(self.populacao, key=lambda r: r.distancia_total)
@@ -53,128 +54,112 @@ class AlgoritmoGenetico:
 
     def evoluir(self):
         nova_populacao = []
-        for i in range(self.populacao_size):
+        for _ in range(self.populacao_size):
             pais = random.sample(self.populacao, 2)
             filho = pais[0].crossover(pais[1])
             filho.mutar()
             nova_populacao.append(filho)
         self.populacao = nova_populacao
-        melhor_geracao = min(self.populacao, key=lambda r: r.distancia_total)
-        if melhor_geracao.distancia_total < self.melhor_rota.distancia_total:
-            self.melhor_rota = melhor_geracao
+        melhor = min(self.populacao, key=lambda r: r.distancia_total)
+        if melhor.distancia_total < self.melhor_rota.distancia_total:
+            self.melhor_rota = melhor
         return self.melhor_rota
 
-# 🖼️ CLASSE DE VISUALIZAÇÃO E CONTROLE (Tkinter + Matplotlib)
 class Visualizador:
     def __init__(self, root):
         self.root = root
-        self.root.title("Simulação de Entrega com Drones - AG")
+        self.root.title("Simulação de Entrega com Drones")
 
-        self.status = tk.Label(self.root, text="Configure os parâmetros e clique em iniciar", fg="blue")
+        self.status = tk.Label(root, text="Configure os parâmetros e clique em iniciar", fg="blue")
         self.status.pack(pady=5)
-
-        self.frame_controls = tk.Frame(self.root)
+        self.frame_controls = tk.Frame(root)
         self.frame_controls.pack(pady=5)
 
-        self.start_button = ttk.Button(self.frame_controls, text="▶ Iniciar", command=self.iniciar)
-        self.start_button.grid(row=0, column=0, padx=5)
-
-        self.pause_button = ttk.Button(self.frame_controls, text="⏸ Pausar", command=self.pausar)
-        self.pause_button.grid(row=0, column=1, padx=5)
-
-        self.reset_button = ttk.Button(self.frame_controls, text="🔄 Reiniciar", command=self.reiniciar)
-        self.reset_button.grid(row=0, column=2, padx=5)
-
         labels = ["Drones", "Autonomia (km)", "População", "Gerações", "Mutação"]
-        defaults = [2, 30, 50, 100, 0.1]
+        defaults = [3, 30, 80, 150, 0.1]
         self.entries = {}
-        for i, (label, default) in enumerate(zip(labels, defaults), start=1):
+        for i, (label, default) in enumerate(zip(labels, defaults)):
             tk.Label(self.frame_controls, text=label + ":").grid(row=i, column=0)
-            entry = ttk.Spinbox(self.frame_controls, from_=1, to=1000, width=5, increment=1 if isinstance(default, int) else 0.01)
+            entry = ttk.Spinbox(self.frame_controls, from_=1, to=1000, width=6, increment=1 if isinstance(default, int) else 0.01)
             entry.set(default)
             entry.grid(row=i, column=1)
             self.entries[label] = entry
 
-        self.fig, self.ax = plt.subplots()
-        self.fig.set_size_inches(10, 6)
-        self.fig.subplots_adjust(right=0.75)
+        self.fig = plt.figure(figsize=(12, 6))
+        self.ax_rota = self.fig.add_subplot(121)
+        self.ax_evol = self.fig.add_subplot(122)
+        self.fig.subplots_adjust(wspace=0.3)
         self.canvas_fig = plt.get_current_fig_manager().canvas
 
-        self.rodando = False
-        self.ani = None
+        try:
+            self.bg_img = mpimg.imread("mapa_sp.png")
+        except:
+            self.bg_img = None
+
+    def dividir_entregas(self, coordenadas, qtd_drones):
+        random.shuffle(coordenadas)
+        chunk = len(coordenadas) // qtd_drones
+        partes = [coordenadas[i*chunk:(i+1)*chunk] for i in range(qtd_drones)]
+        resto = coordenadas[qtd_drones*chunk:]
+        for i, ponto in enumerate(resto):
+            partes[i % qtd_drones].append(ponto)
+        return partes
 
     def iniciar(self):
-        if not self.rodando:
-            qtd_drones = int(self.entries["Drones"].get())
-            self.autonomia = float(self.entries["Autonomia (km)"].get())
-            populacao = int(self.entries["População"].get())
-            self.geracoes = int(self.entries["Gerações"].get())
-            self.mutacao = float(self.entries["Mutação"].get())
+        qtd_drones = int(self.entries["Drones"].get())
+        self.autonomia = float(self.entries["Autonomia (km)"].get())
+        populacao = int(self.entries["População"].get())
+        self.geracoes = int(self.entries["Gerações"].get())
+        self.mutacao = float(self.entries["Mutação"].get())
 
-            coordenadas = BAIRROS_COORDENADAS.copy()
-            random.shuffle(coordenadas)
-            chunk_size = len(coordenadas) // qtd_drones
-            self.partes = [coordenadas[i*chunk_size:(i+1)*chunk_size] for i in range(qtd_drones)]
-            if len(coordenadas) % qtd_drones != 0:
-                self.partes[-1].extend(coordenadas[qtd_drones*chunk_size:])
+        self.partes = self.dividir_entregas(BAIRROS_COORDENADAS.copy(), qtd_drones)
+        self.algoritmos = [AlgoritmoGenetico(parte, self.autonomia, populacao, self.mutacao) for parte in self.partes]
+        self.historico = [[] for _ in range(qtd_drones)]
 
-            self.algoritmos = [
-                AlgoritmoGenetico(parte, self.autonomia, populacao, self.mutacao)
-                for parte in self.partes
-            ]
-
-            self.rodando = True
-            self.ani = animation.FuncAnimation(
-                self.fig, self.update_plot,
-                frames=self.geracoes, interval=500,
-                repeat=False, init_func=self.init_anim, blit=False
-            )
-            self.canvas_fig.draw()
-            plt.show(block=False)
-            self.status.config(text="Simulação em andamento...", fg="green")
-
-    def init_anim(self):
-        self.ax.clear()
-
-    def pausar(self):
-        if self.ani and self.ani.event_source:
-            self.ani.event_source.stop()
-            self.status.config(text="Simulação pausada", fg="orange")
-
-    def reiniciar(self):
-        self.ax.clear()
-        self.rodando = False
-        self.status.config(text="Simulação reiniciada", fg="blue")
+        self.ani = animation.FuncAnimation(self.fig, self.update_plot, frames=self.geracoes, interval=500, repeat=False)
+        self.canvas_fig.draw()
+        plt.show(block=False)
+        self.status.config(text="Simulação em andamento...", fg="green")
 
     def update_plot(self, frame):
-        self.ax.clear()
-        self.ax.set_title(f"Geração {frame + 1}")
-        cores = ["blue", "red", "green", "purple", "orange", "black", "cyan", "brown", "pink", "olive"]
+        self.ax_rota.clear()
+        self.ax_evol.clear()
+        self.ax_rota.set_title(f"Rotas - Geração {frame + 1}")
+        self.ax_evol.set_title("Evolução da Rota (km)")
+        self.ax_evol.set_xlabel("Geração")
+        self.ax_evol.set_ylabel("Distância")
 
+        if self.bg_img is not None:
+            self.ax_rota.imshow(self.bg_img, extent=[-46.83, -46.35, -23.75, -23.40], alpha=0.4)
+
+        cores = ["blue", "red", "green", "purple", "orange", "black"]
         for idx, ag in enumerate(self.algoritmos):
             rota = ag.evoluir()
             x, y = zip(*rota.pontos)
-            self.ax.plot(y, x, marker='o', linestyle='-', color=cores[idx % len(cores)], label=f'Drone {idx+1}')
-            self.ax.scatter(y, x, color=cores[idx % len(cores)], s=20)
+            self.ax_rota.plot(y, x, marker='o', linestyle='-', color=cores[idx % len(cores)], label=f'Drone {idx+1}')
+            self.ax_rota.scatter(y, x, color=cores[idx % len(cores)], s=20)
+            self.historico[idx].append(rota.distancia_total)
+            self.ax_evol.plot(self.historico[idx], label=f'Drone {idx+1}', color=cores[idx % len(cores)])
 
-        self.ax.legend(loc='center left', bbox_to_anchor=(1.02, 0.5), borderaxespad=0.)
+        self.ax_rota.legend(loc='lower left', fontsize=8)
+        self.ax_evol.legend(fontsize=8)
         self.canvas_fig.draw()
 
         if frame + 1 == self.geracoes:
             print("\n📋 RELATÓRIO FINAL")
             for i, ag in enumerate(self.algoritmos):
                 rota = ag.melhor_rota
-                entregas = len(rota.pontos)
-                autonomia = self.autonomia
-                distancia = rota.distancia_total
-                viagens = max(1, round(distancia / autonomia, 1))
-                print(f"Drone {i+1}:")
-                print(f"  - Total de entregas: {entregas}")
-                print(f"  - Distância total: {distancia:.2f} km")
-                print(f"  - Entregas por voo (autonomia {autonomia} km): ~{entregas // int(viagens)}")
-                print(f"  - Recarregamentos necessários: {int(viagens) - 1}\n")
+                entregas = rota.entregas
+                print(f"\n🚁 Drone {i+1}:")
+                print(f"  Total de entregas: {len(entregas)}")
+                print(f"  Distância total percorrida: {rota.distancia_total:.2f} km")
+                voos = max(1, round(rota.distancia_total / self.autonomia, 1))
+                print(f"  Recarregamentos necessários: {int(voos) - 1}")
+                print(f"  Sequência de entregas:")
+                for idx_bairro, ponto in enumerate(entregas, start=1):
+                    print(f"    {idx_bairro}. {ponto}")
 
-# 🚀 PONTO DE ENTRADA
+# Execução
 if __name__ == "__main__":
     root = tk.Tk()
     app = Visualizador(root)
