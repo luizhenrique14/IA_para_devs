@@ -183,9 +183,9 @@ class Visualizador:
                 voos = max(1, round(dist / self.autonomia, 1))
                 tempo_horas = dist / VELOCIDADE
                 print(f"Drone {i+1}:")
-                print(f"  - Sequência de bairros (ordem):")
-                for idx, ponto in enumerate(rota.pontos, 1):
-                    print(f"     {idx:03}: {ponto}")
+                # print(f"  - Sequência de bairros (ordem):")
+                # for idx, ponto in enumerate(rota.pontos, 1):
+                #     print(f"     {idx:03}: {ponto}")
                 print(f"  - Total de entregas: {entregas}")
                 print(f"  - Distância total: {dist:.2f} km")
                 print(f"  - Tempo estimado: {tempo_horas:.2f} horas (velocidade {VELOCIDADE} km/h)")
