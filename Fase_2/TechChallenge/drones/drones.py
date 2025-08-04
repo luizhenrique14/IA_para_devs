@@ -86,7 +86,7 @@ class Visualizador:
         self.reset_button.grid(row=0, column=2, padx=5)
 
         labels = ["Drones", "Autonomia (km)", "População", "Gerações", "Mutação"]
-        defaults = [2, 30, 50, 100, 0.1]
+        defaults = [6, 35, 120, 200, 0.08]
         self.entries = {}
         for i, (label, default) in enumerate(zip(labels, defaults), start=1):
             tk.Label(self.frame_controls, text=label + ":").grid(row=i, column=0)
