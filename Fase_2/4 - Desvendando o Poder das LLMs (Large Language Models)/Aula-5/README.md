@@ -48,12 +48,22 @@ pip install -r requirements.txt
 
 ## Executando o Projeto
 
-1. Primeiro, processe os documentos e crie o banco de dados vetorial:
+1. Primeiro, processe os documentos e crie o banco de dados vetorial usando o Python do ambiente virtual:
+```bash
+"c:/Users/luizh/Workspace/IA_para_devs/Fase_2/4 - Desvendando o Poder das LLMs (Large Language Models)/Aula-5/.venv/Scripts/python.exe" chroma_db.py
+```
+
+Ou, se você estiver com o ambiente virtual ativado:
 ```bash
 python chroma_db.py
 ```
 
-2. Em seguida, inicie a interface do Streamlit:
+2. Em seguida, inicie a interface do Streamlit usando o comando específico do ambiente virtual:
+```bash
+cd "c:\Users\luizh\Workspace\IA_para_devs\Fase_2\4 - Desvendando o Poder das LLMs (Large Language Models)\Aula-5" && "c:/Users/luizh/Workspace/IA_para_devs/Fase_2/4 - Desvendando o Poder das LLMs (Large Language Models)/Aula-5/.venv/Scripts/streamlit.exe" run "Assistente de Receitas Saudáveis.py"
+```
+
+Ou, se você estiver já no diretório correto e com o ambiente virtual ativado, pode usar o comando simplificado:
 ```bash
 streamlit run "Assistente de Receitas Saudáveis.py"
 ```
