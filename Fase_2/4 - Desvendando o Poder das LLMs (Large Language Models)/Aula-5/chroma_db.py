@@ -10,7 +10,7 @@ import os
 import shutil
 
 CHROMA_PATH = "chroma"
-DATA_PATH = r"./receitas"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "receitas")
 
 # Load environment variables. Assumes that project contains .env file with API keys
 load_dotenv()
