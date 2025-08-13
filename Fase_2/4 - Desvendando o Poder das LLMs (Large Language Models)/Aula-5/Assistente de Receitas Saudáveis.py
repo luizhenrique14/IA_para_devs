@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import openai
 from openai import OpenAI
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import ChatPromptTemplate
 import random
@@ -48,15 +48,17 @@ def get_response_from_gpt3(query_text, context):
 
 
 def get_response_from_model(query_text):
-    results = db.similarity_search_with_relevance_scores(query_text, k=4)
-    if len(results) == 0 or results[0][1] < 0.7:
-        return "Não foi possível encontrar resultados correspondentes.", []
-    
-    random.shuffle(results)
-
-
-    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
-    response_text = get_response_from_gpt3(query_text, context_text)
+    try:
+        results = db.similarity_search_with_relevance_scores(query_text, k=4)
+        if len(results) == 0 or results[0][1] < 0.7:
+            return "Não foi possível encontrar resultados correspondentes.", []
+        
+        random.shuffle(results)
+        
+        context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+        response_text = get_response_from_gpt3(query_text, context_text)
+    except Exception as e:
+        return f"Erro ao processar sua solicitação: {str(e)}", []
 
    
     response_with_sources = f"{response_text}\n\n"
