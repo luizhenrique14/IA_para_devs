@@ -1,0 +1,47 @@
+{
+    "isValid": true,
+    "value": {
+        "success": false,
+        "statusCode": 0,
+        "NumeroProtocolo": "19097706",
+        "Status": "Aguardando pagamento",
+        "DataSolicitacao": "08/08/2025",
+        "PrevisaoPagamento": "2025-09-04T00:00:00",
+        "EfetivacaoPagamento": "18/08/2025",
+        "DataCancelamento": "",
+        "DataDevolucao": "",
+        "Condicionado": false,
+        "DataUltimoCondicionamento": "14/08/2025",
+        "DataUltimoDescondicionamento": "2025-08-14T15:18:51",
+        "ValorPago": "27796.530000000006",
+        "DDD": "11",
+        "Prefixo": "95192",
+        "TitularContaCorrente": " LUIZ HENRIQUE OLIVEIRA SILVA",
+        "CpfTitularContaCorrente": "41495681890",
+        "CodigoBanco": "260",
+        "NomeBanco": "NUBANK",
+        "Agencia": "0001",
+        "TipoConta": "Conta Corrente",
+        "ContaBancaria": "7193849-0",
+        "Email": "luiz.oliveira-silva@itau-unibanco.com.br",
+        "LinkImpressaoDemonstrativo": true,
+        "LinkGerarNovoReembolso": true,
+        "LinkImpressaoCartaDevolucao": false,
+        "ListaDocumentosAnexos": [
+            {
+                "Caminho": "7e02e3d5-de28-4b40-89b5-8a176292b44e|4548705605262220250808.zip"
+            },
+            {
+                "Caminho": "c7d7ce58-f886-4dd3-a4bf-ba3807130a0c|\\\\pfs07\\rsaude\\ArquivosApollotemp\\luiz asta carta de correc¸a~o.pdf"
+            },
+            {
+                "Caminho": "744da98c-1d17-4ae0-9079-8bf257ede2ab|ZIP-4548705605262296-4548705605262220250814.zip"
+            }
+        ],
+        "FilaProcessamento": {
+            "SituacaoFilaProcessamento": "Processado",
+            "CodigoPeg": "19097706",
+            "DataCriacaoMensagem": "08/08/2025 13:36:34",
+            "DataAlteracaoMensagem": "08/08/2025 13:40:23"
+        },
+        "ListaProcedimento": [RESTO_DO_SEU_JSON]
