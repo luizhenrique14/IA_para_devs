@@ -1,0 +1,10 @@
+# Dependências principais
+langchain>=0.0.300
+python-dotenv>=1.0.0
+
+# Loaders específicos
+pypdf>=3.0.0  # Para PyPDFLoader
+pandas>=2.0.0  # Para CSVLoader
+requests>=2.31.0  # Para WebBaseLoader
+beautifulsoup4>=4.12.0  # Para WebBaseLoader
+notion-client>=1.0.0  # Para NotionDirectoryLoader
