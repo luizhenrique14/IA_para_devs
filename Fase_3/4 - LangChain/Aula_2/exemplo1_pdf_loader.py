@@ -23,7 +23,7 @@ def carregar_pdf(caminho_pdf):
 
 def main():
     # Caminho para o arquivo PDF de exemplo
-    caminho_pdf = "dados/exemplo1.pdf"
+    caminho_pdf = "dados/pythonlearn.pdf"
     
     try:
         # Carrega o PDF

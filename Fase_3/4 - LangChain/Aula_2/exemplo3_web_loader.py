@@ -19,7 +19,8 @@ def carregar_pagina_web(url):
 
 def main():
     # URL de exemplo
-    url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
+    # url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
+    url = "https://pt.wikipedia.org/wiki/Santos_Futebol_Clube"
     
     try:
         # Carrega a página web
