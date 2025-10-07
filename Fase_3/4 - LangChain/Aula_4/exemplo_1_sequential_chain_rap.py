@@ -133,7 +133,7 @@ if __name__ == "__main__":
     chain = criar_sequential_chain()
     
     # Exemplo de uso com um tema para a letra de rap
-    tema = "paz e amor"
+    tema = "Santos FC"
     print(f"\nGerando letra de rap com o tema: {tema}\n")
     
     resultado = chain.run(input=tema)
