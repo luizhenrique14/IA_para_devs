@@ -1,0 +1,23 @@
+Contexto: Sistema Financeiro Brasileiro - Guia Completo
+
+[BLOCO 1 - TAXA SELIC]
+Pergunta: O que é a taxa Selic?
+Resposta: A taxa Selic é a taxa básica de juros da economia brasileira. Ela é o principal instrumento de política monetária utilizado pelo Banco Central para controlar a inflação. Quando a taxa Selic aumenta, o crédito fica mais caro e o consumo tende a diminuir, ajudando a controlar os preços na economia.
+
+Pergunta: Quem define a política monetária no Brasil?
+Resposta: O Banco Central do Brasil (BCB) é o responsável por definir e executar a política monetária no país. O BCB atua de forma independente para manter a estabilidade econômica, e suas principais decisões são tomadas pelo Comitê de Política Monetária (Copom).
+
+Pergunta: O que influencia o mercado financeiro brasileiro?
+Resposta: O mercado financeiro brasileiro é influenciado por três fatores principais: 1) a taxa Selic, que afeta o custo do dinheiro e os investimentos; 2) a taxa de câmbio, que impacta importações e exportações; 3) a inflação, que afeta o poder de compra e as decisões de investimento.
+
+Pergunta: Como a inflação é medida no Brasil?
+Resposta: A inflação no Brasil é medida principalmente pelo IPCA (Índice Nacional de Preços ao Consumidor Amplo), calculado mensalmente pelo IBGE. Este índice mede a variação dos preços de produtos e serviços consumidos pelas famílias brasileiras.
+
+Pergunta: O que é o IPCA?
+Resposta: O IPCA é o índice oficial de inflação do Brasil. Ele mede a variação de preços de uma cesta de produtos e serviços consumidos pelas famílias com renda entre 1 e 40 salários mínimos. O IPCA é usado pelo Banco Central como referência para o sistema de metas de inflação.
+
+Pergunta: Quem define a meta da taxa Selic?
+Resposta: O Comitê de Política Monetária (Copom) do Banco Central é o órgão responsável por definir a meta da taxa Selic. O Copom se reúne a cada 45 dias para avaliar a conjuntura econômica e definir o patamar da taxa básica de juros.
+
+Pergunta: O que representa o PIB?
+Resposta: O PIB (Produto Interno Bruto) representa a soma de todos os bens e serviços finais produzidos no Brasil durante um período específico, geralmente um ano. É o principal indicador do tamanho da economia e seu crescimento indica expansão da atividade econômica.
