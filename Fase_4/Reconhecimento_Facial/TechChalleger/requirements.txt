@@ -1,0 +1,9 @@
+opencv-python>=4.5.0
+numpy>=1.19.0
+mediapipe>=0.10.0
+deepface>=0.0.79
+tqdm>=4.65.0
+
+# Opcional: face-recognition requer CMake instalado
+# Se não puder instalar CMake, comente a linha abaixo
+# face-recognition>=1.3.0
